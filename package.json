@@ -1,0 +1,30 @@
+{
+  "name": "order-management-system",
+  "version": "1.0.0",
+  "description": "A comprehensive order management system with Node.js backend and React frontend",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run start:frontend\"",
+    "start:backend": "cd backend && npm start",
+    "dev:backend": "cd backend && npm run dev",
+    "start:frontend": "cd frontend && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "init-db": "cd backend && npm run init-db",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "order",
+    "management",
+    "system",
+    "express",
+    "react",
+    "mysql",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}
