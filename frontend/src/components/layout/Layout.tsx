@@ -78,27 +78,70 @@ const Layout: React.FC<LayoutProps> = ({ children, window }) => {
 
   const drawer = (
     <div>
-      <Toolbar>
-        <Typography variant="h6" noWrap component="div">
-          Order Management
-        </Typography>
+      <Toolbar sx={{ height: 72 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{
+              fontWeight: 700,
+              background: 'linear-gradient(45deg, #3a7bd5 30%, #00bcd4 90%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              letterSpacing: '0.5px'
+            }}
+          >
+            Order Management
+          </Typography>
+        </Box>
       </Toolbar>
       <Divider />
-      <List>
-        {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton 
-              selected={location.pathname === item.path}
-              onClick={() => navigate(item.path)}
-            >
-              <ListItemIcon>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      <Box sx={{ p: 1.5 }}>
+        <List sx={{
+          '& .MuiListItemButton-root': {
+            borderRadius: 1.5,
+            mb: 0.5,
+            '&.Mui-selected': {
+              backgroundColor: 'rgba(58, 123, 213, 0.08)',
+              '&:hover': {
+                backgroundColor: 'rgba(58, 123, 213, 0.12)',
+              },
+              '& .MuiListItemIcon-root': {
+                color: 'primary.main',
+              },
+              '& .MuiListItemText-primary': {
+                fontWeight: 600,
+                color: 'primary.main',
+              },
+            },
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+            },
+          },
+        }}>
+          {menuItems.map((item) => (
+            <ListItem key={item.text} disablePadding>
+              <ListItemButton
+                selected={location.pathname === item.path}
+                onClick={() => navigate(item.path)}
+                sx={{ py: 1 }}
+              >
+                <ListItemIcon sx={{ minWidth: 40 }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.text}
+                  primaryTypographyProps={{
+                    fontSize: '0.9rem',
+                    fontWeight: location.pathname === item.path ? 600 : 500
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Box>
     </div>
   );
 
@@ -109,12 +152,17 @@ const Layout: React.FC<LayoutProps> = ({ children, window }) => {
       <CssBaseline />
       <AppBar
         position="fixed"
+        elevation={0}
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
+          backgroundColor: 'background.paper',
+          color: 'text.primary',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ height: 72 }}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -124,28 +172,69 @@ const Layout: React.FC<LayoutProps> = ({ children, window }) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{
+              flexGrow: 1,
+              fontWeight: 600,
+              color: 'text.primary'
+            }}
+          >
             {menuItems.find(item => item.path === location.pathname)?.text || 'Order Management'}
           </Typography>
           {user ? (
             <>
-              <Button 
-                color="inherit" 
+              <Button
+                color="inherit"
                 onClick={handleProfileMenuOpen}
+                sx={{
+                  textTransform: 'none',
+                  borderRadius: 2,
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                  },
+                }}
                 startIcon={
-                  <Avatar 
-                    sx={{ width: 32, height: 32 }}
+                  <Avatar
+                    sx={{
+                      width: 36,
+                      height: 36,
+                      bgcolor: 'primary.main',
+                      fontWeight: 600,
+                      fontSize: '0.9rem'
+                    }}
                   >
                     {user.username.charAt(0).toUpperCase()}
                   </Avatar>
                 }
               >
-                {user.username}
+                <Box sx={{ textAlign: 'left', ml: 0.5 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
+                    {user.username}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1 }}>
+                    {user.role?.charAt(0).toUpperCase() + user.role?.slice(1) || 'User'}
+                  </Typography>
+                </Box>
               </Button>
               <Menu
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={handleProfileMenuClose}
+                PaperProps={{
+                  elevation: 2,
+                  sx: {
+                    minWidth: 180,
+                    mt: 1,
+                    '& .MuiMenuItem-root': {
+                      py: 1,
+                    }
+                  }
+                }}
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               >
                 <MenuItem onClick={handleProfileClick}>
                   <ListItemIcon>
@@ -155,14 +244,19 @@ const Layout: React.FC<LayoutProps> = ({ children, window }) => {
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>
                   <ListItemIcon>
-                    <LogoutIcon fontSize="small" />
+                    <LogoutIcon fontSize="small" color="error" />
                   </ListItemIcon>
-                  <ListItemText>Logout</ListItemText>
+                  <ListItemText primaryTypographyProps={{ color: 'error' }}>Logout</ListItemText>
                 </MenuItem>
               </Menu>
             </>
           ) : (
-            <Button color="inherit" onClick={() => navigate('/login')}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate('/login')}
+              sx={{ borderRadius: 2 }}
+            >
               Login
             </Button>
           )}
@@ -183,7 +277,13 @@ const Layout: React.FC<LayoutProps> = ({ children, window }) => {
           }}
           sx={{
             display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: drawerWidth,
+              borderRight: '1px solid',
+              borderColor: 'divider',
+              boxShadow: 'none',
+            },
           }}
         >
           {drawer}
@@ -192,7 +292,14 @@ const Layout: React.FC<LayoutProps> = ({ children, window }) => {
           variant="permanent"
           sx={{
             display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: drawerWidth,
+              borderRight: '1px solid',
+              borderColor: 'divider',
+              boxShadow: 'none',
+              backgroundColor: 'background.paper',
+            },
           }}
           open
         >
@@ -201,10 +308,18 @@ const Layout: React.FC<LayoutProps> = ({ children, window }) => {
       </Box>
       <Box
         component="main"
-        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+        sx={{
+          flexGrow: 1,
+          p: { xs: 2, sm: 3 },
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          backgroundColor: 'background.default',
+          minHeight: '100vh',
+        }}
       >
-        <Toolbar />
-        {children}
+        <Toolbar sx={{ height: 72 }} />
+        <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
+          {children}
+        </Box>
       </Box>
     </Box>
   );
