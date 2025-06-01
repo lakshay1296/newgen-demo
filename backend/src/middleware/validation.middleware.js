@@ -152,3 +152,26 @@ exports.validateOrderCreation = [
     .isArray().withMessage('Order items must be an array')
     .custom(items => items.length > 0).withMessage('Order must have at least one item')
 ];
+
+// Validate settings update
+exports.validateSettingsUpdate = [
+  body('email_notifications')
+    .optional()
+    .isBoolean().withMessage('Email notifications must be a boolean'),
+  
+  body('dark_mode')
+    .optional()
+    .isBoolean().withMessage('Dark mode must be a boolean'),
+  
+  body('auto_refresh')
+    .optional()
+    .isBoolean().withMessage('Auto refresh must be a boolean'),
+  
+  body('refresh_interval')
+    .optional()
+    .isInt({ min: 1, max: 60 }).withMessage('Refresh interval must be between 1 and 60 minutes'),
+  
+  body('default_page_size')
+    .optional()
+    .isInt({ min: 5, max: 100 }).withMessage('Default page size must be between 5 and 100 items')
+];

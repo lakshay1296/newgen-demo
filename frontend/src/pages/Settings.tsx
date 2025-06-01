@@ -1,17 +1,20 @@
-import React, { useState } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Paper, 
-  Container, 
-  Divider, 
-  Switch, 
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Typography,
+  Paper,
+  Container,
+  Divider,
+  Switch,
   FormControlLabel,
   Button,
   Alert,
   TextField,
-  Snackbar
+  Snackbar,
+  CircularProgress
 } from '@mui/material';
+import { useTheme } from '../contexts/ThemeContext';
+import { settingsAPI } from '../services/api';
 
 const Settings: React.FC = () => {
   const [settings, setSettings] = useState({
@@ -22,14 +25,52 @@ const Settings: React.FC = () => {
     defaultPageSize: 10
   });
   
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const { darkMode, setDarkMode } = useTheme();
+
+  // Load settings from API
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        setLoading(true);
+        const response = await settingsAPI.getSettings();
+        const apiSettings = response.data.data.settings;
+        
+        setSettings({
+          emailNotifications: apiSettings.email_notifications,
+          darkMode: apiSettings.dark_mode,
+          autoRefresh: apiSettings.auto_refresh,
+          refreshInterval: apiSettings.refresh_interval,
+          defaultPageSize: apiSettings.default_page_size
+        });
+        
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching settings:', err);
+        setError('Failed to load settings. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked, type } = event.target;
+    const newValue = type === 'checkbox' ? checked : value;
+    
     setSettings(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: newValue
     }));
+    
+    // Update dark mode in theme context if that's what changed
+    if (name === 'darkMode' && type === 'checkbox') {
+      setDarkMode(checked);
+    }
   };
 
   const handleNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,15 +84,76 @@ const Settings: React.FC = () => {
     }
   };
 
-  const handleSave = () => {
-    // In a real app, this would save to backend or localStorage
-    localStorage.setItem('appSettings', JSON.stringify(settings));
-    setSuccess(true);
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      
+      // Convert settings to API format
+      const apiSettings = {
+        email_notifications: settings.emailNotifications,
+        dark_mode: settings.darkMode,
+        auto_refresh: settings.autoRefresh,
+        refresh_interval: settings.refreshInterval,
+        default_page_size: settings.defaultPageSize
+      };
+      
+      // Save settings to API
+      await settingsAPI.updateSettings(apiSettings);
+      
+      // Show success message
+      setSuccess(true);
+      setError(null);
+    } catch (err) {
+      console.error('Error saving settings:', err);
+      setError('Failed to save settings. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = async () => {
+    try {
+      setLoading(true);
+      
+      // Reset settings to default via API
+      const response = await settingsAPI.resetSettings();
+      const defaultSettings = response.data.data.settings;
+      
+      // Update local state
+      setSettings({
+        emailNotifications: defaultSettings.email_notifications,
+        darkMode: defaultSettings.dark_mode,
+        autoRefresh: defaultSettings.auto_refresh,
+        refreshInterval: defaultSettings.refresh_interval,
+        defaultPageSize: defaultSettings.default_page_size
+      });
+      
+      // Update dark mode in theme context
+      setDarkMode(defaultSettings.dark_mode);
+      
+      // Show success message
+      setSuccess(true);
+      setError(null);
+    } catch (err) {
+      console.error('Error resetting settings:', err);
+      setError('Failed to reset settings. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCloseSnackbar = () => {
     setSuccess(false);
   };
+
+  // Handle loading state
+  if (loading && !settings) {
+    return (
+      <Container maxWidth="md" sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="md">
@@ -150,16 +252,33 @@ const Settings: React.FC = () => {
         
         <Divider sx={{ mb: 3 }} />
         
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button 
-            variant="contained" 
-            color="primary" 
-            onClick={handleSave}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleReset}
+            disabled={loading}
           >
-            Save Settings
+            Reset to Default
+          </Button>
+          
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSave}
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Save Settings'}
           </Button>
         </Box>
       </Paper>
+      
+      {/* Error alert */}
+      {error && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      )}
       
       <Snackbar
         open={success}

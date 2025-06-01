@@ -111,8 +111,20 @@ export const orderAPI = {
   update: (id: number, orderData: any) => 
     api.put(`/orders/${id}`, orderData),
   
-  cancel: (id: number, notes?: string) => 
+  cancel: (id: number, notes?: string) =>
     api.post(`/orders/${id}/cancel`, { notes }),
+};
+
+// Settings API
+export const settingsAPI = {
+  getSettings: () =>
+    api.get('/settings'),
+  
+  updateSettings: (settingsData: any) =>
+    api.put('/settings', settingsData),
+  
+  resetSettings: () =>
+    api.post('/settings/reset'),
 };
 
 export default api;

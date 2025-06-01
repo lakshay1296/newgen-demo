@@ -12,6 +12,7 @@ const authRoutes = require('./routes/auth.routes');
 const customerRoutes = require('./routes/customer.routes');
 const productRoutes = require('./routes/product.routes');
 const orderRoutes = require('./routes/order.routes');
+const settingsRoutes = require('./routes/settings.routes');
 
 // Create Express app
 const app = express();
@@ -34,6 +35,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Root route
 app.get('/', (req, res) => {

@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 // Layout
 import Layout from './components/layout/Layout';
@@ -24,141 +24,6 @@ import Profile from './pages/auth/Profile';
 import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
 
-// Create modern theme
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#3a7bd5',
-      light: '#5e9cf6',
-      dark: '#2c5ea0',
-      contrastText: '#ffffff',
-    },
-    secondary: {
-      main: '#00bcd4',
-      light: '#33c9dc',
-      dark: '#008394',
-      contrastText: '#ffffff',
-    },
-    background: {
-      default: '#f8f9fa',
-      paper: '#ffffff',
-    },
-    text: {
-      primary: '#2d3748',
-      secondary: '#718096',
-    },
-    error: {
-      main: '#e53e3e',
-    },
-    warning: {
-      main: '#ed8936',
-    },
-    info: {
-      main: '#4299e1',
-    },
-    success: {
-      main: '#48bb78',
-    },
-  },
-  typography: {
-    fontFamily: [
-      'Inter',
-      'Roboto',
-      '-apple-system',
-      'BlinkMacSystemFont',
-      'Segoe UI',
-      'Arial',
-      'sans-serif',
-    ].join(','),
-    h1: {
-      fontWeight: 600,
-    },
-    h2: {
-      fontWeight: 600,
-    },
-    h3: {
-      fontWeight: 600,
-    },
-    h4: {
-      fontWeight: 600,
-      fontSize: '1.5rem',
-    },
-    h5: {
-      fontWeight: 600,
-    },
-    h6: {
-      fontWeight: 600,
-    },
-    button: {
-      textTransform: 'none',
-      fontWeight: 500,
-    },
-  },
-  shape: {
-    borderRadius: 8,
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          boxShadow: 'none',
-          '&:hover': {
-            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-          },
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)',
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)',
-          borderRadius: 12,
-          overflow: 'hidden',
-        },
-      },
-    },
-    MuiCardHeader: {
-      styleOverrides: {
-        root: {
-          padding: '16px 20px',
-        },
-        title: {
-          fontSize: '1.125rem',
-          fontWeight: 600,
-        },
-      },
-    },
-    MuiCardContent: {
-      styleOverrides: {
-        root: {
-          padding: '20px',
-        },
-      },
-    },
-    MuiTableCell: {
-      styleOverrides: {
-        head: {
-          fontWeight: 600,
-          backgroundColor: '#f8fafc',
-        },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          fontWeight: 500,
-        },
-      },
-    },
-  },
-});
 
 // Protected route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -319,15 +184,14 @@ const AppContent: React.FC = () => {
     </Router>
   );
 };
-
 const App: React.FC = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AuthProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <CssBaseline />
         <AppContent />
-      </AuthProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
 
